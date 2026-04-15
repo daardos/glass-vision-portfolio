@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DAARDOS | Portfolio</title>
+    <link href="https://googleapis.com" rel="stylesheet">
+    <link rel="stylesheet" href="https://cloudflare.com">
+    
+    <style>
+        :root {
+            --bg: #050505;
+            --accent: #00d2ff;
+            --text: #ffffff;
+            --text-dim: #888;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: var(--bg); 
+            color: var(--text); 
+            font-family: 'Inter', sans-serif; 
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-areas: 
+                "hero hero stats"
+                "about about stack"
+                "about about links";
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 32px;
+            padding: 30px;
+            backdrop-filter: blur(20px);
+            transition: 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        /* --- HERO BLOCK --- */
+        .hero { 
+            grid-area: hero; 
+            display: flex; 
+            align-items: center; 
+            gap: 40px; 
+            position: relative;
+        }
+        
+        .avatar-wrapper {
+            position: relative;
+            width: 160px;
+            height: 160px;
+            flex-shrink: 0;
+        }
+
+        .avatar-img {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid var(--border);
+            z-index: 1;
+            position: relative;
+        }
+
+        .ring {
+            position: absolute;
+            top: -15px; left: -15px;
+            width: calc(100% + 30px);
+            height: calc(100% + 30px);
+            animation: rotate 15s linear infinite;
+        }
+
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .ring svg { width: 100%; height: 100%; overflow: visible; }
+        .ring text {
+            fill: var(--accent);
+            font-weight: 900;
+            font-size: 8px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+
+        .hero-text h1 { font-size: 3.5rem; font-weight: 900; letter-spacing: -2px; line-height: 1; }
+        .hero-text p { color: var(--accent); font-weight: 700; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 3px; margin-bottom: 8px; }
+
+        /* Кнопка главного проекта */
+        .main-project-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 12px 24px;
+            background: rgba(0, 210, 255, 0.1);
+            border: 1px solid var(--accent);
+            border-radius: 100px;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .main-project-btn:hover {
+            background: var(--accent);
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
+            transform: scale(1.05);
+        }
+
+        /* --- ОСТАЛЬНЫЕ БЛОКИ (кратко для структуры) --- */
+        .about { grid-area: about; }
+        .stats { grid-area: stats; display: flex; align-items: center; justify-content: center; }
+        .stack { grid-area: stack; }
+        .links { grid-area: links; display: flex; flex-direction: column; gap: 10px; }
+        .stats-img { width: 100%; filter: invert(1) brightness(1.2) hue-rotate(180deg); }
+        .tag { display: inline-block; padding: 5px 12px; background: rgba(0,210,255,0.1); color: var(--accent); border-radius: 8px; font-size: 0.8rem; margin: 3px; border: 1px solid rgba(0,210,255,0.2); }
+        .social-link { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 16px; transition: 0.3s; }
+        .social-link:hover { background: var(--accent); color: #000; }
+@media (max-width: 600px) {
+    body {
+        padding: 20px 15px; /* Меньше отступы по краям */
+    }
+
+    .container {
+        grid-template-columns: 1fr;
+        grid-template-areas: 
+            "hero"
+            "stats"
+            "about"
+            "stack"
+            "links";
+        gap: 15px;
+    }
+
+    .hero-text h1 {
+        font-size: 2.5rem; /* Уменьшаем заголовок, чтобы не вылезал */
+    }
+
+    .hero {
+        padding: 40px 20px;
+        gap: 20px;
+    }
+
+    .avatar-wrapper {
+        width: 120px;
+        height: 120px;
+    }
+
+    .tabs-nav {
+        width: 100%;
+        overflow-x: auto; /* Позволяем кнопкам скроллиться, если их много */
+        justify-content: flex-start;
+    }
+    
+    .tab-btn {
+        flex: 1; /* Кнопки делят место поровну */
+        white-space: nowrap;
+        padding: 8px 12px;
+        font-size: 0.8rem;
+    }
+    #contactModal {
+    -webkit-overflow-scrolling: touch; /* Плавный скролл для iOS */
+}
+
+}
+
+        /* Навигация вкладок внутри карточки */
+.tabs-nav {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 4px;
+    border-radius: 14px;
+    width: fit-content;
+}
+
+.tab-btn {
+    padding: 8px 20px;
+    border: none;
+    background: transparent;
+    color: var(--text-dim);
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Активное состояние кнопки */
+.tab-btn.active {
+    background: var(--accent);
+    color: #000;
+    box-shadow: 0 4px 12px rgba(0, 210, 255, 0.3);
+}
+
+/* Стили контента вкладок */
+.tab-content {
+    display: none; /* По умолчанию скрыто */
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.4s ease;
+}
+
+/* Активное состояние контента */
+.tab-content.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+    animation: tabAppear 0.4s forwards;
+}
+
+/* Анимация "вплывания" контента */
+@keyframes tabAppear {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Стили для мини-карточек внутри раздела "Приоритеты" */
+.focus-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.focus-item {
+    background: rgba(255, 255, 255, 0.02);
+    padding: 16px;
+    border-radius: 18px;
+    border: 1px solid var(--border);
+    transition: 0.3s;
+}
+
+.focus-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--accent);
+}
+
+.focus-item i {
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+    display: block;
+}
+.card:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent);
+    box-shadow: 0 10px 30px rgba(0, 210, 255, 0.1);
+}
+.typing-text {
+    overflow: hidden;
+    white-space: nowrap;
+    animation: typing 2s steps(20, end), blink .75s step-end infinite;
+}
+
+@keyframes typing { from { width: 0 } to { width: 100% } }
+@keyframes blink { from, to { border-color: transparent } 50% { border-color: var(--accent) } }
+/* Стили для фона */
+body {
+    position: relative;
+    overflow-x: hidden;
+}
+
+.bg-glow {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 20% 30%, rgba(0, 210, 255, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(124, 77, 255, 0.05) 0%, transparent 40%);
+    z-index: -1;
+    filter: blur(80px);
+    animation: glowMove 20s ease-in-out infinite alternate;
+}
+
+@keyframes glowMove {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(5%, 5%) scale(1.1); }
+}
+
+/* Добавим легкую зернистость (Noise), чтобы фон выглядел дороже */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: url('https://vercel.app');
+    opacity: 0.15;
+    pointer-events: none;
+    z-index: -1;
+}
+input:focus, textarea:focus {
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 10px rgba(0, 210, 255, 0.2);
+}
+#canvas-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2; /* Ниже всех карточек и свечения */
+    background: #050505;
+}
+
+    </style>
+</head>
+<body>
+    <canvas id="canvas-bg"></canvas>
+    <div class="bg-glow"></div>
+
+    <div class="container">
+        <!-- ОБНОВЛЕННЫЙ HERO БЛОК -->
+        <div class="card hero">
+            <div class="avatar-wrapper">
+                <img src="https://github.com" class="avatar-img">
+                <div class="ring">
+                    <svg viewBox="0 0 100 100">
+                        <path id="ringPath" d="M 50, 50 m -45, 0 a 45,45 0 1,1 90,0 a 45,45 0 1,1 -90,0" fill="transparent" />
+                        <text><textPath xlink:href="#ringPath">DAARDOS • DEVELOPER • DAARDOS • DEVELOPER •</textPath></text>
+                    </svg>
+                </div>
+            </div>
+            <div class="hero-text">
+                <p>Senior Frontend</p>
+                <h1>DAARDOS</h1>
+                <!-- ССЫЛКА НА ГЛАВНЫЙ ПРОЕКТ -->
+                <a href="https://daardos.github.io/the_daardos/" target="_blank" class="main-project-btn">
+                    <i class="fas fa-external-link-alt"></i> The DAARDOS Project
+                </a>
+            </div>
+        </div>
+
+<div class="card about">
+    <!-- Кнопки управления -->
+    <div class="tabs-nav">
+        <button class="tab-btn active" onclick="openTab(this, 'bio')">Профиль</button>
+        <button class="tab-btn" onclick="openTab(this, 'focus')">Приоритеты</button>
+        <button class="tab-btn" onclick="openTab(this, 'goals')">Цели</button>
+    </div>
+
+    <!-- Вкладка 1: Профиль -->
+    <div id="bio" class="tab-content active">
+        <h3 class="typing-text" style="color: var(--accent); margin-bottom: 12px; border-right: 2px solid; width: fit-content;">Обо мне</h3>
+        <p>Инженер интерфейсов с фокусом на архитектуру.
+Специализируюсь на создании масштабируемых веб-приложений. Мой стек — это HTML5 экосистема во всей её глубине. Верю, что качественный код должен быть таким же эстетичным внутри, как интерфейс снаружи.</p>
+    </div>
+
+    <!-- Вкладка 2: Приоритеты -->
+    <div id="focus" class="tab-content">
+        <h3 style="color: var(--accent); margin-bottom: 15px;">Фокус</h3>
+        <div class="focus-grid">
+            <div class="focus-item">
+                <i class="fas fa-bolt" style="color: #00d2ff;"></i>
+                <strong>Speed</strong>
+                <p style="font-size: 0.8rem; color: var(--text-dim);">Max performance.</p>
+            </div>
+            <div class="focus-item">
+                <i class="fas fa-code" style="color: #7c4dff;"></i>
+                <strong>Clean Code</strong>
+                <p style="font-size: 0.8rem; color: var(--text-dim);">Scalable architecture.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Вкладка 3: Цели -->
+    <div id="goals" class="tab-content">
+        <h3 style="color: var(--accent); margin-bottom: 12px;">Развитие</h3>
+        <p style="margin-bottom: 10px;">• Deep WebGL. Переход от обычных интерфейсов к иммерсивному 3D опыту с использованием Three.js и Shaders.</p>
+        <p style="margin-bottom: 10px;">• I Integration. Внедрение LLM и нейросетевых инструментов напрямую в клиентские интерфейсы для нового уровня UX.</p>
+        <p style="margin-bottom: 10px;">• Open Source. Масштабирование собственных решений и активный вклад в развитие сообщества.</p>
+    </div>
+</div>
+
+        <div class="card stats">
+            <div class="card stats" style="display: flex; flex-direction: column; justify-content: center; gap: 15px;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="width: 10px; height: 10px; background: #00ff88; border-radius: 50%; box-shadow: 0 0 10px #00ff88;"></div>
+        <span style="font-size: 0.8rem; font-weight: 700; letter-spacing: 1px;">AVAILABLE FOR WORK</span>
+    </div>
+    <div style="padding: 10px; background: rgba(255,255,255,0.02); border-radius: 12px; border-left: 3px solid var(--accent);">
+        <p style="font-size: 0.75rem; color: var(--text-dim);">Current task:</p>
+        <p style="font-size: 0.85rem;">Refactoring Core Architecture...</p>
+    </div>
+</div>
+
+        </div>
+
+        <div class="card stack">
+            <h3 style="margin-bottom: 15px;">Стек</h3>
+            <div class="tag">python</div> <div class="tag">HTML5</div> <div class="tag">JavaScript</div> <div class="tag">CSS Canvas</div>
+        </div>
+
+        <div class="card links">
+            <a href="https://github.com" class="social-link"><i class="fab fa-github"></i> GitHub</a>
+<a href="javascript:void(0)" class="social-link" onclick="toggleModal()">
+    <i class="fab fa-google"></i> Написать мне
+</a>
+        </div>
+    </div>
+    <script>
+// --- 1. ФУНКЦИОНАЛ ВКЛАДОК (ABOUT) ---
+function openTab(btn, tabId) {
+    const card = btn.closest('.card');
+    const buttons = card.querySelectorAll('.tab-btn');
+    const contents = card.querySelectorAll('.tab-content');
+
+    buttons.forEach(b => b.classList.remove('active'));
+    contents.forEach(c => c.classList.remove('active'));
+
+    btn.classList.add('active');
+    const targetContent = card.querySelector(`#${tabId}`);
+    if (targetContent) targetContent.classList.add('active');
+}
+
+// --- 2. МОДАЛЬНОЕ ОКНО (CONTACT FORM) ---
+function toggleModal(e) {
+    if (e) e.preventDefault();
+    const modal = document.getElementById('contactModal');
+    if (!modal) return;
+    
+    if (modal.style.display === 'none' || modal.style.display === '') {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden'; // Запрещаем скролл при открытом окне
+    } else {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+}
+
+// Закрытие модалки при клике вне карточки
+window.addEventListener('click', (e) => {
+    const modal = document.getElementById('contactModal');
+    if (e.target === modal) toggleModal();
+});
+
+// --- 3. ИНТЕРАКТИВНЫЙ ФОН (CANVAS) ---
+const canvas = document.getElementById('canvas-bg');
+const ctx = canvas.getContext('2d');
+
+let particles = [];
+let mouse = { x: null, y: null };
+let particleCount = window.innerWidth < 600 ? 35 : 80;
+let connectionDistance = window.innerWidth < 600 ? 80 : 120;
+
+// Класс частицы (объявлен ДО использования в функциях)
+class Particle {
+    constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.vx = (Math.random() - 0.5) * 0.5;
+        this.vy = (Math.random() - 0.5) * 0.5;
+        this.radius = 1.5;
+    }
+    update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+    }
+    draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0, 210, 255, 0.5)';
+        ctx.fill();
+    }
+}
+
+function init() {
+    particles = [];
+    for (let i = 0; i < particleCount; i++) {
+        particles.push(new Particle());
+    }
+}
+
+function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    particleCount = window.innerWidth < 600 ? 35 : 80;
+    connectionDistance = window.innerWidth < 600 ? 80 : 120;
+    init();
+}
+
+// Слушатели событий
+window.addEventListener('resize', resize);
+window.addEventListener('mousemove', (e) => { 
+    mouse.x = e.x; 
+    mouse.y = e.y; 
+});
+
+// Поддержка тач-событий (для телефонов)
+window.addEventListener('touchstart', (e) => {
+    mouse.x = e.touches[0].clientX;
+    mouse.y = e.touches[0].clientY;
+});
+window.addEventListener('touchend', () => {
+    mouse.x = null;
+    mouse.y = null;
+});
+
+// Запуск Canvas
+resize();
+
+function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    particles.forEach((p, index) => {
+        p.update();
+        p.draw();
+        
+        // Линии к мышке
+        if (mouse.x !== null) {
+            let dxm = p.x - mouse.x;
+            let dym = p.y - mouse.y;
+            let distM = Math.sqrt(dxm*dxm + dym*dym);
+            if (distM < 150) {
+                ctx.beginPath();
+                ctx.strokeStyle = `rgba(0, 210, 255, ${1 - distM/150})`;
+                ctx.lineWidth = 0.5;
+                ctx.moveTo(p.x, p.y);
+                ctx.lineTo(mouse.x, mouse.y);
+                ctx.stroke();
+            }
+        }
+
+        // Линии между точками
+        for (let j = index + 1; j < particles.length; j++) {
+            const p2 = particles[j];
+            let dx = p.x - p2.x;
+            let dy = p.y - p2.y;
+            let dist = Math.sqrt(dx*dx + dy*dy);
+            
+            if (dist < connectionDistance) {
+                ctx.beginPath();
+                ctx.strokeStyle = `rgba(0, 210, 255, ${1 - dist/connectionDistance - 0.2})`;
+                ctx.lineWidth = 0.3;
+                ctx.moveTo(p.x, p.y);
+                ctx.lineTo(p2.x, p2.y);
+                ctx.stroke();
+            }
+        }
+    });
+    requestAnimationFrame(animate);
+}
+
+animate();
+
+    </script>
+
+<div id="contactModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); z-index: 9999; align-items: center; justify-content: center;">
+    <div class="card" style="width: 90%; max-width: 400px; border: 1px solid var(--border); padding: 30px;">
+        <h3 style="color: var(--accent); margin-bottom: 20px;">Написать сообщение</h3>
+        
+        <!-- Проверьте ID формы здесь! -->
+        <form action="https://formspree.io/f/xpqkqlla" method="POST" style="display: flex; flex-direction: column; gap: 15px;">
+            <input type="email" name="email" placeholder="Ваш Email" required style="background: rgba(255,255,255,0.05); border: 1px solid var(--border); padding: 12px; border-radius: 12px; color: #fff; outline: none;">
+            <textarea name="message" placeholder="Текст сообщения..." required style="background: rgba(255,255,255,0.05); border: 1px solid var(--border); padding: 12px; border-radius: 12px; color: #fff; height: 120px; resize: none; outline: none;"></textarea>
+            
+            <button type="submit" class="main-project-btn" style="width: 100%; justify-content: center; cursor: pointer;">Отправить</button>
+            <button type="button" onclick="toggleModal()" style="background: none; border: none; color: var(--text-dim); cursor: pointer; margin-top: 10px; font-size: 0.8rem;">ЗАКРЫТЬ</button>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>
