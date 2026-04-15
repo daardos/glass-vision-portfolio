@@ -1,11 +1,6 @@
 # 🌌 DAARDOS | Senior Frontend Portfolio
 
-![License](https://shields.io)
-![Tech](https://shields.io)
-
 Современное высокотехнологичное портфолио в стиле **Glassmorphism**, сфокусированное на визуальной чистоте и интерактивном пользовательском опыте.
-
-[🚀 Демонстрация проекта](https://github.io)
 
 ## ✨ Особенности
 - **Interactive Canvas Background:** Кастомная система частиц на JS, реагирующая на курсор и тач-события.
